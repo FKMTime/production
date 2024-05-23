@@ -3,7 +3,7 @@ services:
     image: "ghcr.io/fkmtime/fkmtime-backend:main"
     container_name: fkmtime-backend
     ports:
-      - '5000:5000'
+      - "5000:5000"
     restart: unless-stopped
     environment:
       - DATABASE_URL=postgres://root:password@database:5432/fkm_time
@@ -13,7 +13,7 @@ services:
     volumes:
       - sock:/app/sock
     healthcheck:
-      test: [ "CMD-SHELL", "curl -f http://localhost:5000/health || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://localhost:5000/health || exit 1"]
       interval: 5s
       timeout: 20s
       retries: 50
@@ -25,8 +25,8 @@ services:
     image: postgres:16
     container_name: fkmtime-database
     ports:
-      - '5432:5432'
-    restart: unless-stopped 
+      - "5432:5432"
+    restart: unless-stopped
     environment:
       - POSTGRES_USER=root
       - POSTGRES_PASSWORD=password
@@ -34,7 +34,7 @@ services:
     volumes:
       - database:/var/lib/postgresql/data
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -d postgres" ]
+      test: ["CMD-SHELL", "pg_isready -d postgres"]
       interval: 5s
       timeout: 20s
       retries: 50
@@ -44,7 +44,7 @@ services:
     restart: unless-stopped
     container_name: fkmtime-nginx
     ports:
-      - '80:80'
+      - "80:80"
     env_file:
       - .env
     depends_on:
@@ -65,13 +65,13 @@ services:
       DOZZLE_BASE: /logs
       DOZZLE_AUTH_PROVIDER: simple
     healthcheck:
-      test: [ "CMD", "/dozzle", "healthcheck" ]
+      test: ["CMD", "/dozzle", "healthcheck"]
       interval: 3s
       timeout: 30s
       retries: 50
 
   micro_connector:
-    image: "ghcr.io/fkmtime/fkmtime-micro-connector:main"
+    image: "ghcr.io/fkmtime/fkmtime-micro-connector:master"
     container_name: micro-connector
     network_mode: host
     volumes:
@@ -87,3 +87,4 @@ services:
 volumes:
   database:
   sock:
+
