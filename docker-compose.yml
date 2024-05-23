@@ -83,8 +83,10 @@ services:
       - RUST_LOG=none,backend=debug
       - SOCKET_PATH=/app/sock/socket.sock
     restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_healthy
 
 volumes:
   database:
   sock:
-
