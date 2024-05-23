@@ -1,0 +1,89 @@
+services:
+  backend:
+    image: "ghcr.io/fkmtime/fkmtime-backend:main"
+    container_name: fkmtime-backend
+    ports:
+      - '5000:5000'
+    restart: unless-stopped
+    environment:
+      - DATABASE_URL=postgres://root:password@database:5432/fkm_time
+      - SOCKET_PATH=/app/sock/socket.sock
+    env_file:
+      - .env
+    volumes:
+      - sock:/app/sock
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://localhost:5000/health || exit 1"]
+      interval: 5s
+      timeout: 20s
+      retries: 50
+    depends_on:
+      database:
+        condition: service_healthy
+
+  database:
+    image: postgres:16
+    container_name: fkmtime-database
+    ports:
+      - '5432:5432'
+    restart: unless-stopped 
+    environment:
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=fkm_time
+    volumes:
+      - database:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -d postgres" ]
+      interval: 5s
+      timeout: 20s
+      retries: 50
+
+  nginx:
+    image: "ghcr.io/fkmtime/fkmtime-nginx:main"
+    restart: unless-stopped
+    container_name: fkmtime-nginx
+    ports:
+      - '80:80'
+    env_file:
+      - .env
+    depends_on:
+      backend:
+        condition: service_healthy
+      dozzle:
+        condition: service_healthy
+
+  dozzle:
+    container_name: dozzle
+    image: amir20/dozzle:latest
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./dozzle:/data
+    ports:
+      - "8080:8080"
+    environment:
+      DOZZLE_BASE: /logs
+      DOZZLE_AUTH_PROVIDER: simple
+    healthcheck:
+      test: [ "CMD", "/dozzle", "healthcheck" ]
+      interval: 3s
+      timeout: 30s
+      retries: 50
+
+  micro_connector:
+    image: "ghcr.io/fkmtime/fkmtime-micro-connector:main"
+    container_name: micro-connector
+    network_mode: host
+    volumes:
+      - /run/dbus:/run/dbus:ro
+      - sock:/app/sock
+    environment:
+      - PORT=8080
+      - FIRMWARE_DIR=/app/firmware
+      - RUST_LOG=none,backend=debug
+      - SOCKET_PATH=/app/sock/socket.sock
+    restart: unless-stopped
+
+volumes:
+  database:
+  sock:
