@@ -24,8 +24,6 @@ services:
   database:
     image: postgres:16
     container_name: fkmtime-database
-    ports:
-      - "5432:5432"
     restart: unless-stopped
     environment:
       - POSTGRES_USER=root
