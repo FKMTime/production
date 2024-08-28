@@ -2,8 +2,6 @@ services:
   backend:
     image: "ghcr.io/fkmtime/fkmtime-backend:main"
     container_name: fkmtime-backend
-    ports:
-      - "5000:5000"
     restart: unless-stopped
     environment:
       - DATABASE_URL=postgres://root:password@database:5432/fkm_time
@@ -74,11 +72,13 @@ services:
     network_mode: host
     volumes:
       - /run/dbus:/run/dbus:ro
+      - /tmp/fkm-logs:/logs
       - sock:/app/sock
     environment:
       - PORT=8081
       - FIRMWARE_DIR=/app/firmware
       - RUST_LOG=none,backend=debug
+      - DEVICE_LOGS=/logs
       - SOCKET_PATH=/app/sock/socket.sock
     restart: unless-stopped
     depends_on:
