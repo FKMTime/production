@@ -52,6 +52,7 @@ services:
   dozzle:
     container_name: dozzle
     image: amir20/dozzle:latest
+    restart: unless-stopped
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./dozzle:/data
@@ -72,7 +73,7 @@ services:
     network_mode: host
     volumes:
       - /run/dbus:/run/dbus:ro
-      - /tmp/fkm-logs:/logs
+      - logs:/logs
       - sock:/app/sock
     environment:
       - PORT=8081
@@ -88,3 +89,4 @@ services:
 volumes:
   database:
   sock:
+  logs:
