@@ -46,8 +46,6 @@ services:
     depends_on:
       backend:
         condition: service_healthy
-      dozzle:
-        condition: service_healthy
 
   dozzle:
     container_name: dozzle
@@ -61,11 +59,6 @@ services:
     environment:
       DOZZLE_BASE: /logs
       DOZZLE_AUTH_PROVIDER: simple
-    healthcheck:
-      test: ["CMD", "/dozzle", "healthcheck"]
-      interval: 3s
-      timeout: 30s
-      retries: 50
 
   micro_connector:
     image: "ghcr.io/fkmtime/fkmtime-micro-connector:master"
