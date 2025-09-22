@@ -74,6 +74,8 @@ services:
       - RUST_LOG=none,backend=debug
       - DEVICE_LOGS=/logs
       - SOCKET_PATH=/app/sock/socket.sock
+    env_file:
+      - .env
     restart: unless-stopped
     depends_on:
       backend:
