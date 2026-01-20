@@ -3,6 +3,10 @@ services:
     image: "ghcr.io/fkmtime/fkmtime-backend:main"
     container_name: fkmtime-backend
     restart: unless-stopped
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
+      - 1.1.1.1
     environment:
       - DATABASE_URL=postgres://root:password@database:5432/fkm_time
       - SOCKET_PATH=/app/sock/socket.sock
@@ -23,6 +27,10 @@ services:
     image: postgres:16
     container_name: fkmtime-database
     restart: unless-stopped
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
+      - 1.1.1.1
     environment:
       - POSTGRES_USER=root
       - POSTGRES_PASSWORD=password
@@ -38,6 +46,10 @@ services:
   nginx:
     image: "ghcr.io/fkmtime/fkmtime-nginx:main"
     restart: unless-stopped
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
+      - 1.1.1.1
     container_name: fkmtime-nginx
     ports:
       - "80:80"
@@ -51,6 +63,10 @@ services:
     container_name: dozzle
     image: amir20/dozzle:latest
     restart: unless-stopped
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
+      - 1.1.1.1
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./dozzle:/data
@@ -77,6 +93,10 @@ services:
     env_file:
       - .env
     restart: unless-stopped
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
+      - 1.1.1.1
     depends_on:
       backend:
         condition: service_healthy
