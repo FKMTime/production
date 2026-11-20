@@ -10,10 +10,16 @@ services:
     environment:
       - DATABASE_URL=postgres://root:password@database:5432/fkm_time
       - SOCKET_PATH=/app/sock/socket.sock
+      # The connector's device logs, for admins to read in the panel
+      - DEVICE_LOGS_DIR=/device-logs
+      # The backend's own log, for admins to read in the panel
+      - BACKEND_LOGS_DIR=/backend-logs
     env_file:
       - .env
     volumes:
       - sock:/app/sock
+      - logs:/device-logs:ro
+      - backend-logs:/backend-logs
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:5000/health || exit 1"]
       interval: 5s
@@ -59,23 +65,6 @@ services:
       backend:
         condition: service_healthy
 
-  dozzle:
-    container_name: dozzle
-    image: amir20/dozzle:latest
-    restart: unless-stopped
-    dns:
-      - 8.8.8.8
-      - 8.8.4.4
-      - 1.1.1.1
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - ./dozzle:/data
-    ports:
-      - "8080:8080"
-    environment:
-      DOZZLE_BASE: /logs
-      DOZZLE_AUTH_PROVIDER: simple
-
   micro_connector:
     image: "ghcr.io/fkmtime/fkmtime-micro-connector:master"
     container_name: micro-connector
@@ -107,4 +96,5 @@ volumes:
   database:
   sock:
   logs:
+  backend-logs:
 
